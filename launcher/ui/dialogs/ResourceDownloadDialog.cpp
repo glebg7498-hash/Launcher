@@ -21,6 +21,9 @@
 #include <QList>
 
 #include <QPushButton>
+#include <QPushButton>
+#include <QProcess>
+#include <QCoreApplication>
 #include <algorithm>
 #include <utility>
 
@@ -149,7 +152,15 @@ void ResourceDownloadDialog::connectButtons()
 
     auto* helpButton = m_buttons.button(QDialogButtonBox::Help);
     connect(helpButton, &QPushButton::clicked, m_container, &PageContainer::help);
-}
+    // Кнопка запуска внешнего поиска, только в окне модов
+    if (dynamic_cast<ModDownloadDialog*>(this) != nullptr) {
+        auto* finderButton = m_buttons.addButton(tr("Search other versions"), QDialogButtonBox::ActionRole);
+        finderButton->setDefault(false);
+        finderButton->setAutoDefault(false);
+        connect(finderButton, &QPushButton::clicked, this, []() {
+            QProcess::startDetached(QCoreApplication::applicationDirPath() + "/mod_finder.exe", {});
+        });
+    }}
 
 void ResourceDownloadDialog::confirm()
 {
